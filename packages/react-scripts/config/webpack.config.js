@@ -694,32 +694,12 @@ module.exports = function(webpackEnv) {
       // NOTE: FilterWarningsPlugin is used to ignore warning coming from sourcemaps
       new FilterWarningsPlugin({ exclude: /Cannot find source file/ }),
 
-      // Generates an `index.html` file with the <script> injected.
-      new HtmlWebpackPlugin(
-        Object.assign(
-          {},
-          {
-            inject: true,
-            template: paths.appHtml,
-          },
-          isEnvProduction
-            ? {
-                minify: {
-                  removeComments: true,
-                  collapseWhitespace: true,
-                  removeRedundantAttributes: true,
-                  useShortDoctype: true,
-                  removeEmptyAttributes: true,
-                  removeStyleLinkTypeAttributes: true,
-                  keepClosingSlash: true,
-                  minifyJS: true,
-                  minifyCSS: true,
-                  minifyURLs: true,
-                },
-              }
-            : undefined
-        )
-      ),
+      // NOTE: HtmlWebpackPlugin, and InterpolateHtmlPlugin are injected here
+      // after SpeedMeasureWebpackPlugin makes a wrapper, so SMWP won't track them
+      // they cause issues when tracked by SMWP
+      // SEE: https://github.com/jantimon/html-webpack-plugin/issues/1090
+      // SEE: injectSpeedMeasurePluginIncompatiblePlugins
+
       // Inlines the webpack runtime script. This script is too small to warrant
       // a network request.
       // https://github.com/facebook/create-react-app/issues/5358
