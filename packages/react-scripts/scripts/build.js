@@ -43,10 +43,11 @@ const printHostingInstructions = require('react-dev-utils/printHostingInstructio
 const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
 function printBuildError(err) {
   const msg = ((err != null && err.message) ? err.message : err) + '\n';
-  if (process.env.TF_BUILD)
+  if (process.env.TF_BUILD) {
     console.log("##vso[task.logissue type=error;]%s", msg);
-  else
+  } else {
     console.error(msg);
+  }
 }
 
 const measureFileSizesBeforeBuild =
