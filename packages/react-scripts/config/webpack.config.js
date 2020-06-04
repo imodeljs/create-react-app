@@ -59,6 +59,8 @@ const shouldDebugBuildPerformance =
 
 const shouldUseProdSourceMap = process.env.USE_FULL_SOURCEMAP === 'true';
 
+const shouldNotOptimize = process.env.NON_OPTIMIZED === 'true';
+
 // End iModel.js Changes block
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
@@ -175,7 +177,7 @@ module.exports = function(webpackEnv) {
           inject: true,
           template: paths.appHtml,
         },
-        isEnvProduction
+        isEnvProduction && !shouldNotOptimize
           ? {
               minify: {
                 removeComments: true,
@@ -291,7 +293,7 @@ module.exports = function(webpackEnv) {
       globalObject: 'this',
     },
     optimization: {
-      minimize: isEnvProduction,
+      minimize: isEnvProduction && !shouldNotOptimize,
       minimizer: [
         // This is only used in production mode
         new TerserPlugin({
@@ -538,7 +540,7 @@ module.exports = function(webpackEnv) {
                 cacheDirectory: true,
                 // See #6846 for context on why cacheCompression is disabled
                 cacheCompression: false,
-                compact: isEnvProduction,
+                compact: isEnvProduction && !shouldNotOptimize,
               },
             },
             // Process any JS outside of the app with Babel.

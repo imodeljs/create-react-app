@@ -16,11 +16,13 @@ Current upstream with `react-scripts@3.4.1`.
 
   > Note: These configuration variables are an extension of the [Advanced Configurations](create-react-app.dev/docs/advanced-configuration) supported by create-react-app.
 
-  | Variable                | Development | Production | Usage                                                                                                                                                                    |
-  | ----------------------- | ----------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-  | USE_FAST_SASS           | ✅ Used     | ✅ Used    | When set to `true`, use the fast-sass-loader instead of sass-loader. This helps with long build times on smaller machines attempting to build an app with a large amount of scss/sass files. |
-  | DEBUG_BUILD_PERFORMANCE | ✅ Used     | 🚫 Ignored | When set to `true`, reports webpack build performance and bottlenecks. Uses the [speed measure webpack plugin](https://www.npmjs.com/package/speed-measure-webpack-plugin).                  |
-  | USE_FULL_SOURCEMAP | ✅ Used     | 🚫 Ignored | When set to `true`, the sourcemaps generated use 'source-map' instead of 'cheap-module-source-map'. This is known to cause out-of-memory errors but gives full fidelity source maps in debug builds.|
+  | Variable                | Development | Production | Usage                                                                                                                                                                                                |
+  | ----------------------- | ----------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+  | USE_FAST_SASS           | ✅ Used     | ✅ Used    | When set to `true`, use the fast-sass-loader instead of sass-loader. This helps with long build times on smaller machines attempting to build an app with a large amount of scss/sass files.         |
+  | DEBUG_BUILD_PERFORMANCE | ✅ Used     | 🚫 Ignored | When set to `true`, reports webpack build performance and bottlenecks. Uses the [speed measure webpack plugin](https://www.npmjs.com/package/speed-measure-webpack-plugin).                          |
+  | USE_FULL_SOURCEMAP      | ✅ Used     | 🚫 Ignored | When set to `true`, the sourcemaps generated use 'source-map' instead of 'cheap-module-source-map'. This is known to cause out-of-memory errors but gives full fidelity source maps in debug builds. |
+  | NON_OPTIMIZED           | 🚫 Ignored  | ✅ Used    | When set to `true`,                                                                                                                                                                                  |
+
 - Typing changes
 
   - By default, typescript tests are not type checked causing issue when trying to compile them later.
