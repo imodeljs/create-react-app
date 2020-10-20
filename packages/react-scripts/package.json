@@ -1,6 +1,6 @@
 {
   "name": "@bentley/react-scripts",
-  "version": "3.4.5",
+  "version": "3.4.6",
   "description": "iModel.js configuration and scripts for Create React App.",
   "repository": {
     "type": "git",
