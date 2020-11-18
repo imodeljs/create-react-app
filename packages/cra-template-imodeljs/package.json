@@ -1,6 +1,6 @@
 {
   "name": "@bentley/cra-template-imodeljs",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "license": "MIT",
   "author": {
     "name": "Bentley Systems, Inc.",
@@ -66,11 +66,7 @@
     "react-dom": "^16.13.0"
   },
   "devDependencies": {
-    "@bentley/build-tools": "^2.5.5",
-    "@bentley/ecschema-metadata": "^2.7.0",
-    "@bentley/orbitgt-core": "^2.7.0",
-    "@bentley/product-settings-client": "^2.7.0",
-    "@bentley/react-scripts": "3.4.1",
+    "@bentley/build-tools": "^2.5.5",    
     "@bentley/webgl-compatibility": "^2.7.0",
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
@@ -84,7 +80,7 @@
   },
   "homepage": "http://localhost:3000/",
   "browserslist": [
-    "electron 6.0.0",
+    "electron 8.0.0",
     "last 4 chrome version",
     "last 4 firefox version",
     "last 4 safari version",
