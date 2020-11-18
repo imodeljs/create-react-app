@@ -25,14 +25,14 @@ export class iModeljsApp {
     await IModelApp.startup({ applicationVersion: "1.0.0" });
 
     // initialize OIDC
-      await iModeljsApp.initializeOidc();
+    await iModeljsApp.initializeOidc();
 
     // contains various initialization promises which need
     // to be fulfilled before the app is ready
     const initPromises = new Array<Promise<any>>();
 
     // initialize RPC communication
-      initPromises.push(iModeljsApp.initializeRpc());
+    initPromises.push(iModeljsApp.initializeRpc());
 
     // initialize UiComponents
     initPromises.push(UiComponents.initialize(IModelApp.i18n));
