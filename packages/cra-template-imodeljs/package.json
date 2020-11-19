@@ -26,11 +26,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/ashish-srivastava-dev/cra-template-imodeljs",
+    "url": "https://github.com/imodeljs/create-react-app/",
     "directory": "/"
   },
   "bugs": {
-    "url": "https://github.com/ashish-srivastava-dev/cra-template-imodeljs/issues"
+    "url": "https://github.com/imodeljs/create-react-app/issues"
   },
   "private": true,
   "scripts": {
@@ -77,25 +77,5 @@
     "rimraf": "^2.6.2",
     "typescript": "~3.7.4",
     "webpack": "4.42.0"
-  },
-  "homepage": "http://localhost:3000/",
-  "browserslist": [
-    "electron 8.0.0",
-    "last 4 chrome version",
-    "last 4 firefox version",
-    "last 4 safari version",
-    "last 4 ios version",
-    "last 4 ChromeAndroid version",
-    "last 4 edge version",
-    "not dead",
-    "not <0.2%"
-  ],
-  "eslintConfig": {
-    "extends": "./node_modules/@bentley/build-tools/.eslintrc.js",
-    "parserOptions": {
-      "project": [
-        "tsconfig.json"
-      ]
-    }
-  }
+  }  
 }

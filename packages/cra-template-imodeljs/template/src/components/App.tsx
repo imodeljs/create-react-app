@@ -5,12 +5,10 @@ import { IModelQuery } from "@bentley/imodelhub-client";
 import { AuthorizedFrontendRequestContext, DrawingViewState, FrontendRequestContext, IModelApp, IModelConnection, RemoteBriefcaseConnection, SpatialViewState } from "@bentley/imodeljs-frontend";
 import { SignIn, ViewportComponent } from "@bentley/ui-components";
 import { Button, ButtonSize, ButtonType, Spinner, SpinnerSize } from "@bentley/ui-core";
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import { iModeljsApp } from "../api/App";
 import "./App.css";
 import Toolbar from "./Toolbar";
-
-// cSpell:ignore imodels
 
 /** React state of the App component */
 export interface AppState {
@@ -22,41 +20,45 @@ export interface AppState {
   viewDefinitionId?: Id64String;
 }
 
-/** A component the renders the whole application UI */
-export default class App extends React.Component<{}, AppState> {
+/** A component that renders the whole application UI */
+const App = () => {
+  const [appState, setAppState] = useState<AppState>({
+    user: {
+      isAuthorized: iModeljsApp.oidcClient.isAuthorized,
+      isLoading: false
+    }
+  });
 
-  /** Creates an App instance */
-  constructor(props?: any, context?: any) {
-    super(props, context);
-    this.state = {
-      user: {
-        isAuthorized: iModeljsApp.oidcClient.isAuthorized,
-        isLoading: false,
-      },
-    };
-  }
-
-  public componentDidMount() {
+  useEffect(() => {
     // Initialize authorization state, and add listener to changes
-    iModeljsApp.oidcClient.onUserStateChanged.addListener(this._onUserStateChanged);
-  }
+    iModeljsApp.oidcClient.onUserStateChanged.addListener(_onUserStateChanged);
+    return () => {
+      // unsubscribe from user state changes
+      iModeljsApp.oidcClient.onUserStateChanged.removeListener(_onUserStateChanged);
+    }
+  }, []);
 
-  public componentWillUnmount() {
-    // unsubscribe from user state changes
-    iModeljsApp.oidcClient.onUserStateChanged.removeListener(this._onUserStateChanged);
-  }
-
-  private _onStartSignin = async () => {
-    this.setState((prev) => ({ user: { ...prev.user, isLoading: true } }));
+  const _onStartSignin = async () => {
+    setAppState({
+      user: {
+        isAuthorized: appState.user.isAuthorized,
+        isLoading: true
+      }
+    });
     iModeljsApp.oidcClient.signIn(new FrontendRequestContext());  // eslint-disable-line @typescript-eslint/no-floating-promises
   }
 
-  private _onUserStateChanged = () => {
-    this.setState((prev) => ({ user: { ...prev.user, isAuthorized: iModeljsApp.oidcClient.isAuthorized, isLoading: false } }));
+  const _onUserStateChanged = () => {
+    setAppState({
+      user: {
+        isAuthorized: iModeljsApp.oidcClient.isAuthorized,
+        isLoading: false
+      }
+    });
   }
 
   /** Pick the first available spatial view definition in the imodel */
-  private async getFirstViewDefinitionId(imodel: IModelConnection): Promise<Id64String> {
+  const getFirstViewDefinitionId = async (imodel: IModelConnection): Promise<Id64String> => {
     // Return default view definition (if any)
     const defaultViewId = await imodel.views.queryDefaultViewId();
     if (Id64.isValid(defaultViewId))
@@ -76,70 +78,77 @@ export default class App extends React.Component<{}, AppState> {
   }
 
   /** Handle iModel open event */
-  private _onIModelSelected = async (imodel: IModelConnection | undefined) => {
+  const _onIModelSelected = async (imodel: IModelConnection | undefined) => {
     if (!imodel) {
       // reset the state when imodel is closed
-      this.setState({ imodel: undefined, viewDefinitionId: undefined });
+      setAppState({
+        user: appState.user,
+        imodel: undefined,
+        viewDefinitionId: undefined
+      });
       return;
     }
     try {
       // attempt to get a view definition
-      const viewDefinitionId = await this.getFirstViewDefinitionId(imodel);
-      this.setState({ imodel, viewDefinitionId });
+      const viewDefinitionId = await getFirstViewDefinitionId(imodel);
+      setAppState({
+        user: appState.user,
+        imodel: imodel,
+        viewDefinitionId: viewDefinitionId
+      });
     } catch (e) {
       // if failed, close the imodel and reset the state
       await imodel.close();
-      this.setState({ imodel: undefined, viewDefinitionId: undefined });
+      setAppState({
+        user: appState.user,
+        imodel: undefined,
+        viewDefinitionId: undefined
+      });
       alert(e.message);
     }
   }
 
-  private get _signInRedirectUri() {
+  const _signInRedirectUri = () => {
     const split = (Config.App.get("imjs_browser_test_redirect_uri") as string).split("://");
     return split[split.length - 1];
   }
 
   /** The component's render method */
-  public render() {
-    let ui: React.ReactNode;
+  let ui: React.ReactNode;
 
-    if (this.state.user.isLoading || window.location.href.includes(this._signInRedirectUri)) {
-      // if user is currently being loaded, just tell that
-      ui = `signing-in...`;
-    } else if (!this.state.user.isAuthorized) {
-      // if user doesn't have and access token, show sign in page
-      ui = (<SignIn onSignIn={this._onStartSignin} />);
-    } else if (!this.state.imodel || !this.state.viewDefinitionId) {
-      // if we don't have an imodel / view definition id - render a button that initiates imodel open
-      ui = (<OpenIModelButton onIModelSelected={this._onIModelSelected} />);
-    } else {
-      // if we do have an imodel and view definition id - render imodel components
-      ui = (<IModelComponents imodel={this.state.imodel} viewDefinitionId={this.state.viewDefinitionId} />);
-    }
-
-    // render the app
-    return (
-      <div className="app">
-        {ui}
-      </div>
-    );
+  if (appState.user.isLoading || window.location.href.includes(_signInRedirectUri())) {
+    // if user is currently being loaded, just tell that
+    ui = `signing-in...`;
+  } else if (!appState.user.isAuthorized) {
+    // if user doesn't have and access token, show sign in page
+    ui = (<SignIn onSignIn={_onStartSignin} />);
+  } else if (!appState.imodel || !appState.viewDefinitionId) {
+    // if we don't have an imodel / view definition id - render a button that initiates imodel open
+    ui = (<OpenIModelButton onIModelSelected={_onIModelSelected} />);
+  } else {
+    // if we do have an imodel and view definition id - render imodel components
+    ui = (<IModelComponents imodel={appState.imodel} viewDefinitionId={appState.viewDefinitionId} />);
   }
+
+  // render the app
+  return (
+    <div className="app">
+      {ui}
+    </div>
+  );
 }
 
 /** React props for [[OpenIModelButton]] component */
 interface OpenIModelButtonProps {
   onIModelSelected: (imodel: IModelConnection | undefined) => void;
 }
-/** React state for [[OpenIModelButton]] component */
-interface OpenIModelButtonState {
-  isLoading: boolean;
-}
+
 /** Renders a button that opens an iModel identified in configuration */
-class OpenIModelButton extends React.PureComponent<OpenIModelButtonProps, OpenIModelButtonState> {
-  public state = { isLoading: false };
+function OpenIModelButton(props: OpenIModelButtonProps) {
+  const [loadingState, setLoadingState] = useState({ isLoading: false });
 
   /** Finds project and imodel ids using their names */
-  private async getIModelInfo(): Promise<{ projectId: string, imodelId: string }> {
+  const getIModelInfo = async (): Promise<{ projectId: string, imodelId: string }> => {
     const imodelName = Config.App.get("imjs_test_imodel");
     const projectName = Config.App.get("imjs_test_project", imodelName);
 
@@ -163,46 +172,44 @@ class OpenIModelButton extends React.PureComponent<OpenIModelButtonProps, OpenIM
   }
 
   /** Handle iModel open event */
-  private async onIModelSelected(imodel: IModelConnection | undefined) {
-    this.props.onIModelSelected(imodel);
-    this.setState({ isLoading: false });
+  const onIModelSelected = async (imodel: IModelConnection | undefined) => {
+    props.onIModelSelected(imodel);
+    setLoadingState({ isLoading: false });
   }
 
-  private _onClickOpen = async () => {
-    this.setState({ isLoading: true });
+  const _onClickOpen = async () => {
+    setLoadingState({ isLoading: true });
     let imodel: IModelConnection | undefined;
     try {
       // attempt to open the imodel
-      const info = await this.getIModelInfo();
+      const info = await getIModelInfo();
       imodel = await RemoteBriefcaseConnection.open(info.projectId, info.imodelId, OpenMode.Readonly);
     } catch (e) {
       alert(e.message);
     }
-    await this.onIModelSelected(imodel);
+    await onIModelSelected(imodel);
   }
 
-  private _onClickSignOut = async () => {
+  const _onClickSignOut = async () => {
     if (iModeljsApp.oidcClient)
       iModeljsApp.oidcClient.signOut(new FrontendRequestContext());  // eslint-disable-line @typescript-eslint/no-floating-promises
   }
 
-  public render() {
-    return (
+  return (
+    <div>
       <div>
-        <div>
-          <Button size={ButtonSize.Large} buttonType={ButtonType.Primary} className="button-open-imodel" onClick={this._onClickOpen}>
-            <span>Open iModel</span>
-            {this.state.isLoading ? <span style={{ marginLeft: "8px" }}><Spinner size={SpinnerSize.Small} /></span> : undefined}
-          </Button>
-        </div>
-        <div>
-          <Button size={ButtonSize.Large} buttonType={ButtonType.Primary} className="button-signout" onClick={this._onClickSignOut}>
-            <span>Sign Out</span>
-          </Button>
-        </div>
+        <Button size={ButtonSize.Large} buttonType={ButtonType.Primary} className="button-open-imodel" onClick={_onClickOpen}>
+          <span>Open iModel</span>
+          {loadingState.isLoading ? <span style={{ marginLeft: "8px" }}><Spinner size={SpinnerSize.Small} /></span> : undefined}
+        </Button>
       </div>
-    );
-  }
+      <div>
+        <Button size={ButtonSize.Large} buttonType={ButtonType.Primary} className="button-signout" onClick={_onClickSignOut}>
+          <span>Sign Out</span>
+        </Button>
+      </div>
+    </div>
+  );
 }
 
 /** React props for [[IModelComponents]] component */
@@ -212,16 +219,16 @@ interface IModelComponentsProps {
 }
 
 /** Renders a viewport */
-class IModelComponents extends React.PureComponent<IModelComponentsProps> {
-  public render() {
-    return (
-      <>
-        <ViewportComponent
-          style={{ height: "100vh" }}
-          imodel={this.props.imodel}
-          viewDefinitionId={this.props.viewDefinitionId} />
-        <Toolbar />
-      </>
-    );
-  }
+function IModelComponents(props: IModelComponentsProps) {
+  return (
+    <>
+      <ViewportComponent
+        style={{ height: "100vh" }}
+        imodel={props.imodel}
+        viewDefinitionId={props.viewDefinitionId} />
+      <Toolbar />
+    </>
+  );
 }
+
+export default App;
