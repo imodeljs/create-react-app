@@ -17,7 +17,7 @@ export function getSupportedRpcs(): RpcInterfaceDefinition[] {
 }
 
 // Boiler plate code
-export class iModeljsApp {
+export class Api {
 
   public static get oidcClient() { return IModelApp.authorizationClient as BrowserAuthorizationClient; }
 
@@ -25,14 +25,14 @@ export class iModeljsApp {
     await IModelApp.startup({ applicationVersion: "1.0.0" });
 
     // initialize OIDC
-    await iModeljsApp.initializeOidc();
+    await Api.initializeOidc();
 
     // contains various initialization promises which need
     // to be fulfilled before the app is ready
     const initPromises = new Array<Promise<any>>();
 
     // initialize RPC communication
-    initPromises.push(iModeljsApp.initializeRpc());
+    initPromises.push(Api.initializeRpc());
 
     // initialize UiComponents
     initPromises.push(UiComponents.initialize(IModelApp.i18n));
@@ -61,7 +61,7 @@ export class iModeljsApp {
     IModelApp.authorizationClient = new BrowserAuthorizationClient(oidcConfig);
 
     try {
-      await iModeljsApp.oidcClient.signInSilent(new ClientRequestContext());
+      await Api.oidcClient.signInSilent(new ClientRequestContext());
     } catch (err) { }
   }
 

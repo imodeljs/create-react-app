@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Logger, LogLevel } from "@bentley/bentleyjs-core";
-import { iModeljsApp } from "./api/App";
+import { Api } from "./api";
 import App from "./components/App";
 import "./index.css";
 
@@ -12,7 +12,7 @@ Logger.setLevel("iModeljs-app", LogLevel.Info); // Override the above default an
 
 (async () => {  // eslint-disable-line @typescript-eslint/no-floating-promises
   // initialize the application
-  await iModeljsApp.startup();
+  await Api.startup();
 
   // when initialization is complete, render
   ReactDOM.render(

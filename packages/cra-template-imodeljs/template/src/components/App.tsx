@@ -6,7 +6,7 @@ import { AuthorizedFrontendRequestContext, DrawingViewState, FrontendRequestCont
 import { SignIn, ViewportComponent } from "@bentley/ui-components";
 import { Button, ButtonSize, ButtonType, Spinner, SpinnerSize } from "@bentley/ui-core";
 import React, { useState, useEffect } from "react";
-import { iModeljsApp } from "../api/App";
+import { Api } from "../api";
 import "./App.css";
 import Toolbar from "./Toolbar";
 
@@ -24,17 +24,17 @@ export interface AppState {
 const App = () => {
   const [appState, setAppState] = useState<AppState>({
     user: {
-      isAuthorized: iModeljsApp.oidcClient.isAuthorized,
+      isAuthorized: Api.oidcClient.isAuthorized,
       isLoading: false
     }
   });
 
   useEffect(() => {
     // Initialize authorization state, and add listener to changes
-    iModeljsApp.oidcClient.onUserStateChanged.addListener(_onUserStateChanged);
+    Api.oidcClient.onUserStateChanged.addListener(_onUserStateChanged);
     return () => {
       // unsubscribe from user state changes
-      iModeljsApp.oidcClient.onUserStateChanged.removeListener(_onUserStateChanged);
+      Api.oidcClient.onUserStateChanged.removeListener(_onUserStateChanged);
     }
   }, []);
 
@@ -45,13 +45,13 @@ const App = () => {
         isLoading: true
       }
     });
-    iModeljsApp.oidcClient.signIn(new FrontendRequestContext());  // eslint-disable-line @typescript-eslint/no-floating-promises
+    Api.oidcClient.signIn(new FrontendRequestContext());  // eslint-disable-line @typescript-eslint/no-floating-promises
   }
 
   const _onUserStateChanged = () => {
     setAppState({
       user: {
-        isAuthorized: iModeljsApp.oidcClient.isAuthorized,
+        isAuthorized: Api.oidcClient.isAuthorized,
         isLoading: false
       }
     });
@@ -191,8 +191,8 @@ function OpenIModelButton(props: OpenIModelButtonProps) {
   }
 
   const _onClickSignOut = async () => {
-    if (iModeljsApp.oidcClient)
-      iModeljsApp.oidcClient.signOut(new FrontendRequestContext());  // eslint-disable-line @typescript-eslint/no-floating-promises
+    if (Api.oidcClient)
+      Api.oidcClient.signOut(new FrontendRequestContext());  // eslint-disable-line @typescript-eslint/no-floating-promises
   }
 
   return (
