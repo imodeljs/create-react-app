@@ -145,31 +145,7 @@ interface OpenIModelButtonProps {
 
 /** Renders a button that opens an iModel identified in configuration */
 function OpenIModelButton(props: OpenIModelButtonProps) {
-  const [loadingState, setLoadingState] = useState({ isLoading: false });
-
-  /** Finds project and imodel ids using their names */
-  const getIModelInfo = async (): Promise<{ projectId: string, imodelId: string }> => {
-    const imodelName = Config.App.get("imjs_test_imodel");
-    const projectName = Config.App.get("imjs_test_project", imodelName);
-
-    const requestContext: AuthorizedFrontendRequestContext = await AuthorizedFrontendRequestContext.create();
-
-    const connectClient = new ContextRegistryClient();
-    let project: Project;
-    try {
-      const projects: Project[] = await connectClient.getInvitedProjects(requestContext, { $filter: `Name+eq+'${projectName}'` });
-      project = projects[0];
-    } catch (e) {
-      throw new Error(`Project with name "${projectName}" does not exist`);
-    }
-
-    const imodelQuery = new IModelQuery();
-    imodelQuery.byName(imodelName);
-    const imodels = await IModelApp.iModelClient.iModels.get(requestContext, project.wsgId, imodelQuery);
-    if (imodels.length === 0)
-      throw new Error(`iModel with name "${imodelName}" does not exist in project "${projectName}"`);
-    return { projectId: project.wsgId, imodelId: imodels[0].wsgId };
-  }
+  const [loadingState, setLoadingState] = useState({ isLoading: false });  
 
   /** Handle iModel open event */
   const onIModelSelected = async (imodel: IModelConnection | undefined) => {
@@ -182,8 +158,11 @@ function OpenIModelButton(props: OpenIModelButtonProps) {
     let imodel: IModelConnection | undefined;
     try {
       // attempt to open the imodel
-      const info = await getIModelInfo();
-      imodel = await RemoteBriefcaseConnection.open(info.projectId, info.imodelId, OpenMode.Readonly);
+      const imodelId = Config.App.get("imjs_test_imodel");
+      const projectId = Config.App.get("imjs_test_project");
+
+      imodel = await RemoteBriefcaseConnection.open(projectId, imodelId, OpenMode.Readonly);
+      console.log(`App.tsx : _onClickOpen - iModel Id is: ${imodelId}`);
     } catch (e) {
       alert(e.message);
     }
