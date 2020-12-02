@@ -4,15 +4,14 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Environment Variables
 
-Prior to running the app, add a valid clientId and iModelId for your user in the .env file:
+Prior to running the app, add a valid clientId, iModelId and projectId for your user in the .env file:
 
 ```
 # ---- Test ids ----
 imjs_browser_test_client_id = ""
 imjs_test_imodel = ""
+imjs_test_project = ""
 ```
-
-You can also replace the OIDC client data in this file with your own if you'd prefer.
 
 ## Available Scripts
 
