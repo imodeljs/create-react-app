@@ -8,7 +8,7 @@ It demonstrates the minimum setup for opening an iModel and viewing its graphics
 * _Toolbar_: Includes basic viewport tools in top-right corner of viewport (select, fit, rotate, pan, zoom).
 
 This app serves as a guide on how you can embed one or more of these components into your own application.
-See http://imodeljs.org for comprehensive documentation on the iModel.js API and the various constructs used in this sample.
+See https://www.itwinjs.org for comprehensive documentation on the iModel.js API and the various constructs used in this sample.
 
 To use this template, add `--template @bentley/cra-template-imodeljs` when creating a new app. You should also use the @bentley/react-scripts scripts version to compile your application.
 
@@ -35,7 +35,7 @@ The purpose of this sample application is to demonstrate the following:
 * [Dependencies](./package.json) required for iModel.js-based frontend applications.
 * [Scripts](./package.json) recommended to build and run iModel.js-based applications.
 * How to set up a simple [frontend for web](./src/frontend/api/iModeljsApp.ts).
-* How to obtain an [access token](https://www.imodeljs.org/learning/common/accesstoken/) used to access iModelHub and other services.
+* How to obtain an [access token](https://www.itwinjs.org/learning/common/accesstoken/) used to access iModelHub and other services.
 * How to [consume](./src/frontend/components/App.tsx) iModel.js React components.
 * How to [setup a viewport](./src/frontend/components/App.tsx#L106).
 * How to include
