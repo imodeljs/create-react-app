@@ -26,11 +26,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/facebook/create-react-app.git",
+    "url": "https://github.com/imodeljs/create-react-app.git",
     "directory": "packages/cra-template-imodeljs"
   },
   "bugs": {
-    "url": "https://github.com/facebook/create-react-app/issues"
+    "url": "https://github.com/imodeljs/create-react-app/issues"
   },
   "private": true
 }
