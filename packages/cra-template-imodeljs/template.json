@@ -35,14 +35,10 @@
       "npm-run-all": "^4.1.5"    
     },
     "scripts": {
-      "build": "npm run build:frontend",
-      "build:frontend": "cross-env GENERATE_SOURCEMAP=false USE_FAST_SASS=true react-scripts build",
+      "build": "cross-env GENERATE_SOURCEMAP=false USE_FAST_SASS=true react-scripts build",
       "clean": "rimraf build lib .rush",
       "lint": "eslint --config package.json --no-eslintrc ./src/**/*.{ts,tsx} 1>&2",
-      "start": "npm run start:servers",
-      "start:webserver": "cross-env USE_FAST_SASS=true react-scripts start",
-      "start:servers": "run-p \"start:webserver\"",
-      "test": ""
+      "start": "cross-env USE_FAST_SASS=true react-scripts start"
     },
     "browserslist": [
       "electron 8.0.0",
