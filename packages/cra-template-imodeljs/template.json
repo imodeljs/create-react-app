@@ -51,8 +51,7 @@
       "not dead",
       "not <0.2%"
     ],
-    "eslintConfig": {
-      "extends": "./node_modules/@bentley/build-tools/.eslintrc.js",
+    "eslintConfig": {      
       "parserOptions": {
         "project": [
           "tsconfig.json"

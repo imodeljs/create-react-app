@@ -112,7 +112,6 @@ const App = () => {
     return split[split.length - 1];
   }
 
-  /** The component's render method */
   let ui: React.ReactNode;
 
   if (appState.user.isLoading || window.location.href.includes(_signInRedirectUri())) {

@@ -34,13 +34,13 @@ The purpose of this sample application is to demonstrate the following:
 
 * [Dependencies](./package.json) required for iModel.js-based frontend applications.
 * [Scripts](./package.json) recommended to build and run iModel.js-based applications.
-* How to set up a simple [frontend for web](./src/frontend/api/iModeljsApp.ts).
+* How to set up a simple [frontend for web](./template/src/api.ts).
 * How to obtain an [access token](https://www.itwinjs.org/learning/common/accesstoken/) used to access iModelHub and other services.
-* How to [consume](./src/frontend/components/App.tsx) iModel.js React components.
-* How to [setup a viewport](./src/frontend/components/App.tsx#L106).
+* How to [consume](./template/src/components/App.tsx) iModel.js React components.
+* How to [setup a viewport](./template/src/components/App.tsx#L115).
 * How to include
-  [tools](./src/frontend/components/Toolbar.tsx) in a
-  [viewport](./src/frontend/components/App.tsx#L205).
+  [tools](./template/src/components/Toolbar.tsx) in a
+  [viewport](./template/src/components/App.tsx#L186).
 
 ## Contributing
 
