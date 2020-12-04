@@ -6,16 +6,6 @@ import { UrlDiscoveryClient } from "@bentley/itwin-client";
 import { UiComponents } from "@bentley/ui-components";
 import { IModelReadRpcInterface, IModelTileRpcInterface, RpcInterfaceDefinition } from "@bentley/imodeljs-common";
 
-/**
- * Returns a list of RPCs supported by this application
- */
-export function getSupportedRpcs(): RpcInterfaceDefinition[] {
-  return [
-    IModelReadRpcInterface,
-    IModelTileRpcInterface,
-  ];
-}
-
 // Boiler plate code
 export class Api {
 
@@ -41,9 +31,19 @@ export class Api {
     await Promise.all(initPromises);
   }
 
+  /**
+ * Returns a list of RPCs supported by this application
+ */
+private static getSupportedRpcs(): RpcInterfaceDefinition[] {
+  return [
+    IModelReadRpcInterface,
+    IModelTileRpcInterface,
+  ];
+}
+
   private static async initializeRpc(): Promise<void> {
     let rpcParams = await this.getConnectionInfo();
-    const rpcInterfaces = getSupportedRpcs();
+    const rpcInterfaces = this.getSupportedRpcs();
     if (!rpcParams) {
       throw new Error(`Error in setting GeneralPurpose backend`);
     }
