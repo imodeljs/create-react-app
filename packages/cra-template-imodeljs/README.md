@@ -2,13 +2,13 @@
 
 This is a [Create React App](https://github.com/facebook/create-react-app) template for an iModel.js sample application.
 
-It demonstrates the minimum setup for opening an iModel and viewing its graphics in a viewport with basic viewing tools. 
+It demonstrates the minimum setup for opening an iModel and viewing its graphics in a viewport with basic viewing tools.
 
 * _Viewport_: Renders geometric data onto an HTMLCanvasElement.
 * _Toolbar_: Includes basic viewport tools in top-right corner of viewport (select, fit, rotate, pan, zoom).
 
 This app serves as a guide on how you can embed one or more of these components into your own application.
-See https://www.itwinjs.org for comprehensive documentation on the iModel.js API and the various constructs used in this sample.
+See <https://www.itwinjs.org> for comprehensive documentation on the iModel.js API and the various constructs used in this sample.
 
 To use this template, add `--template @bentley/cra-template-imodeljs` when creating a new app. You should also use the @bentley/react-scripts scripts version to compile your application.
 
@@ -24,9 +24,8 @@ yarn create react-app my-app-name --template @bentley/cra-template-imodeljs --sc
 
 For more information, please refer to:
 
-- [Getting Started](https://create-react-app.dev/docs/getting-started) – How to create a new app.
-- [User Guide](https://create-react-app.dev) – How to develop apps bootstrapped with Create React App.
-
+* [Getting Started](https://create-react-app.dev/docs/getting-started) – How to create a new app.
+* [User Guide](https://create-react-app.dev) – How to develop apps bootstrapped with Create React App.
 
 ## Purpose
 
@@ -45,4 +44,3 @@ The purpose of this sample application is to demonstrate the following:
 ## Contributing
 
 [Contributing to iModel.js](https://github.com/imodeljs/imodeljs/blob/master/CONTRIBUTING.md)
-
