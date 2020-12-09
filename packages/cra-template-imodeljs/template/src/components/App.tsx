@@ -1,13 +1,12 @@
-import { Config, Id64, Id64String, OpenMode } from "@bentley/bentleyjs-core";
+import { Config, Id64, Id64String } from "@bentley/bentleyjs-core";
 import "@bentley/icons-generic-webfont/dist/bentley-icons-generic-webfont.css";
-
-import { DrawingViewState, FrontendRequestContext, IModelConnection, RemoteBriefcaseConnection, SpatialViewState } from "@bentley/imodeljs-frontend";
-import { SignIn, ViewportComponent } from "@bentley/ui-components";
-import { Button, ButtonSize, ButtonType, Spinner, SpinnerSize } from "@bentley/ui-core";
+import { DrawingViewState, FrontendRequestContext, IModelConnection, SpatialViewState } from "@bentley/imodeljs-frontend";
+import { SignIn } from "@bentley/ui-components";
 import React, { useState, useEffect } from "react";
 import { Api } from "../api";
 import "./App.css";
-import Toolbar from "./Toolbar";
+import RenderViewportComponent from "./RenderViewportComponent";
+import IModelButtonComponent from "./IModelButtonComponent";
 
 /** React state of the App component */
 export interface AppState {
@@ -122,10 +121,10 @@ const App = () => {
     ui = (<SignIn onSignIn={_onStartSignin} />);
   } else if (!appState.imodel || !appState.viewDefinitionId) {
     // if we don't have an imodel / view definition id - render a button that initiates imodel open
-    ui = (<OpenIModelButton onIModelSelected={_onIModelSelected} />);
+    ui = (<IModelButtonComponent onIModelSelected={_onIModelSelected} />);
   } else {
     // if we do have an imodel and view definition id - render imodel components
-    ui = (<IModelComponents imodel={appState.imodel} viewDefinitionId={appState.viewDefinitionId} />);
+    ui = (<RenderViewportComponent imodel={appState.imodel} viewDefinitionId={appState.viewDefinitionId} />);
   }
 
   // render the app
@@ -133,78 +132,6 @@ const App = () => {
     <div className="app">
       {ui}
     </div>
-  );
-}
-
-/** React props for [[OpenIModelButton]] component */
-interface OpenIModelButtonProps {
-  onIModelSelected: (imodel: IModelConnection | undefined) => void;
-}
-
-/** Renders a button that opens an iModel identified in configuration */
-function OpenIModelButton(props: OpenIModelButtonProps) {
-  const [loadingState, setLoadingState] = useState({ isLoading: false });  
-
-  /** Handle iModel open event */
-  const onIModelSelected = async (imodel: IModelConnection | undefined) => {
-    props.onIModelSelected(imodel);
-    setLoadingState({ isLoading: false });
-  }
-
-  const _onClickOpen = async () => {
-    setLoadingState({ isLoading: true });
-    let imodel: IModelConnection | undefined;
-    try {
-      // attempt to open the imodel
-      const imodelId = Config.App.get("imjs_test_imodel");
-      const projectId = Config.App.get("imjs_test_project");
-
-      imodel = await RemoteBriefcaseConnection.open(projectId, imodelId, OpenMode.Readonly);
-      console.log(`App.tsx : _onClickOpen - iModel Id is: ${imodelId}`);
-    } catch (e) {
-      alert(e.message);
-    }
-    await onIModelSelected(imodel);
-  }
-
-  const _onClickSignOut = async () => {
-    if (Api.oidcClient)
-      Api.oidcClient.signOut(new FrontendRequestContext());  // eslint-disable-line @typescript-eslint/no-floating-promises
-  }
-
-  return (
-    <div>
-      <div>
-        <Button size={ButtonSize.Large} buttonType={ButtonType.Primary} className="button-open-imodel" onClick={_onClickOpen}>
-          <span>Open iModel</span>
-          {loadingState.isLoading ? <span style={{ marginLeft: "8px" }}><Spinner size={SpinnerSize.Small} /></span> : undefined}
-        </Button>
-      </div>
-      <div>
-        <Button size={ButtonSize.Large} buttonType={ButtonType.Primary} className="button-signout" onClick={_onClickSignOut}>
-          <span>Sign Out</span>
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-/** React props for [[IModelComponents]] component */
-interface IModelComponentsProps {
-  imodel: IModelConnection;
-  viewDefinitionId: Id64String;
-}
-
-/** Renders a viewport */
-function IModelComponents(props: IModelComponentsProps) {
-  return (
-    <>
-      <ViewportComponent
-        style={{ height: "100vh" }}
-        imodel={props.imodel}
-        viewDefinitionId={props.viewDefinitionId} />
-      <Toolbar />
-    </>
   );
 }
 
