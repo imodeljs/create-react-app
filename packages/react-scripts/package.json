@@ -105,6 +105,9 @@
       "optional": true
     }
   },
+  "resolutions": {
+    "immer": "^8.0.1"
+  },
   "browserslist": {
     "production": [
       ">0.2%",
