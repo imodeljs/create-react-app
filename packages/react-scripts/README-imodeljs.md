@@ -21,6 +21,7 @@ Current upstream with `react-scripts@3.4.1`.
   | USE_FAST_SASS           | ✅ Used     | ✅ Used    | When set to `true`, use the fast-sass-loader instead of sass-loader. This helps with long build times on smaller machines attempting to build an app with a large amount of scss/sass files.         |
   | DEBUG_BUILD_PERFORMANCE | ✅ Used     | 🚫 Ignored | When set to `true`, reports webpack build performance and bottlenecks. Uses the [speed measure webpack plugin](https://www.npmjs.com/package/speed-measure-webpack-plugin).                          |
   | USE_FULL_SOURCEMAP      | ✅ Used     | 🚫 Ignored | When set to `true`, the sourcemaps generated use 'source-map' instead of 'cheap-module-source-map'. This is known to cause out-of-memory errors but gives full fidelity source maps in debug builds. |
+  | DISABLE_ESLINT          | ✅ Used     | ✅ Used    | When set to `true`, webpack will not run eslint at all. This can speedup builds when you want to keep build and lint as separate steps. |
 
 - Typing changes
 

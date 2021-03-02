@@ -60,6 +60,7 @@ const shouldDebugBuildPerformance =
 
 const shouldUseProdSourceMap = process.env.USE_FULL_SOURCEMAP === 'true';
 
+const shouldLint = process.env.DISABLE_ESLINT !== 'true';
 // End iModel.js Changes block
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
@@ -433,7 +434,7 @@ module.exports = function(webpackEnv) {
 
         // First, run the linter.
         // It's important to do this before Babel processes the JS.
-        {
+        shouldLint && {
           test: /\.(js|mjs|jsx|ts|tsx)$/,
           enforce: 'pre',
           use: [
@@ -682,7 +683,7 @@ module.exports = function(webpackEnv) {
             // Make sure to add the new loader(s) before the "file" loader.
           ],
         },
-      ],
+      ].filter(Boolean),
     },
     plugins: [
       // NOTE: iModel.js specific plugin to allow exposing iModel.js shared libraries
