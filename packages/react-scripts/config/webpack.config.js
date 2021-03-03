@@ -64,6 +64,8 @@ const shouldLint = process.env.DISABLE_ESLINT !== 'true';
 
 const shouldTranspileDeps = process.env.TRANSPILE_DEPS !== 'false';
 
+const shouldMinify = process.env.DISABLE_TERSER !== 'true';
+
 // End iModel.js Changes block
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
@@ -296,7 +298,7 @@ module.exports = function(webpackEnv) {
       globalObject: 'this',
     },
     optimization: {
-      minimize: isEnvProduction,
+      minimize: isEnvProduction && shouldMinify,
       minimizer: [
         // This is only used in production mode
         new TerserPlugin({
