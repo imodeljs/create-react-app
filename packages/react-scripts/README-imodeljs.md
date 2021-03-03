@@ -22,6 +22,7 @@ Current upstream with `react-scripts@3.4.1`.
   | DEBUG_BUILD_PERFORMANCE | ✅ Used     | 🚫 Ignored | When set to `true`, reports webpack build performance and bottlenecks. Uses the [speed measure webpack plugin](https://www.npmjs.com/package/speed-measure-webpack-plugin).                          |
   | USE_FULL_SOURCEMAP      | ✅ Used     | 🚫 Ignored | When set to `true`, the sourcemaps generated use 'source-map' instead of 'cheap-module-source-map'. This is known to cause out-of-memory errors but gives full fidelity source maps in debug builds. |
   | DISABLE_ESLINT          | ✅ Used     | ✅ Used    | When set to `true`, webpack will not run eslint at all. This can speedup builds when you want to keep build and lint as separate steps. |
+  | TRANSPILE_DEPS          | ✅ Used     | ✅ Used    | When set to `false`, webpack will not run babel on anything in node_modules. Transpiling dependencies can be costly, and is often not necessary when targeting newer browsers. |
 
 - Typing changes
 

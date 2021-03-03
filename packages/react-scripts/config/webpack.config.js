@@ -61,6 +61,9 @@ const shouldDebugBuildPerformance =
 const shouldUseProdSourceMap = process.env.USE_FULL_SOURCEMAP === 'true';
 
 const shouldLint = process.env.DISABLE_ESLINT !== 'true';
+
+const shouldTranspileDeps = process.env.TRANSPILE_DEPS !== 'false';
+
 // End iModel.js Changes block
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
@@ -547,7 +550,7 @@ module.exports = function(webpackEnv) {
             },
             // Process any JS outside of the app with Babel.
             // Unlike the application JS, we only compile the standard ES features.
-            {
+            shouldTranspileDeps && {
               test: /\.(js|mjs)$/,
               exclude: /@babel(?:\/|\\{1,2})runtime/,
               loader: require.resolve('babel-loader'),
@@ -681,7 +684,7 @@ module.exports = function(webpackEnv) {
             },
             // ** STOP ** Are you adding a new loader?
             // Make sure to add the new loader(s) before the "file" loader.
-          ],
+          ].filter(Boolean),
         },
       ].filter(Boolean),
     },
