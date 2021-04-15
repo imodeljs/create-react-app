@@ -47,8 +47,9 @@ const FilterWarningsPlugin = require('webpack-filter-warnings-plugin');
 const {
   BanBackendImportsPlugin,
   IModeljsLibraryExportsPlugin,
-  CopyBentleyStaticResourcesPlugin,
 } = require('@bentley/webpack-tools-core');
+
+const CopyPlugin = require('copy-webpack-plugin');
 
 // iModel.js change to support using the fast-sass-loader instead of sass-loader.
 // This solves long build times on smaller machines attempting to build an app with
@@ -412,7 +413,7 @@ module.exports = function(webpackEnv) {
       },
       plugins: [
         // Throw an error if @bentley/imodeljs-backend or src/backend/... files are imported.
-        new BanBackendImportsPlugin(path.join(paths.appSrc, "backend")),
+        new BanBackendImportsPlugin(path.join(paths.appSrc, 'backend')),
         // Adds support for installing with Plug'n'Play, leading to faster installs and adding
         // guards against forgotten dependencies and such.
         PnpWebpackPlugin,
@@ -696,9 +697,32 @@ module.exports = function(webpackEnv) {
       new IModeljsLibraryExportsPlugin(),
 
       // NOTE: iModel.js specific plugin to copy a set of static resources from the node_modules
-      // directory of each dependent package into the  'lib/public' directory.
+      // directory of each dependent package into the 'build/public' directory.
       // Used for resources such as locales, which are defined by each consuming package.
-      new CopyBentleyStaticResourcesPlugin(['public'], true),
+      new CopyPlugin({
+        patterns: [
+          {
+            from: '**/public/**/*',
+            context: 'node_modules/@bentley',
+            noErrorOnMissing: true,
+            to({ absoluteFilename }) {
+              return Promise.resolve(
+                /(public\\)(.*)/.exec(absoluteFilename)[2]
+              );
+            },
+          },
+          {
+            from: '**/public/**/*',
+            context: 'node_modules/@itwin',
+            noErrorOnMissing: true,
+            to({ absoluteFilename }) {
+              return Promise.resolve(
+                /(public\\)(.*)/.exec(absoluteFilename)[2]
+              );
+            },
+          },
+        ],
+      }),
 
       // NOTE: FilterWarningsPlugin is used to ignore warning coming from sourcemaps
       new FilterWarningsPlugin({ exclude: /Failed to parse source map/ }),
