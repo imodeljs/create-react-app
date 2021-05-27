@@ -46,6 +46,7 @@ const FilterWarningsPlugin = require('webpack-filter-warnings-plugin');
 
 const {
   BanBackendImportsPlugin,
+  CopyStaticAssetsPlugin,
   IModeljsLibraryExportsPlugin,
 } = require('@bentley/webpack-tools-core');
 
@@ -699,30 +700,7 @@ module.exports = function(webpackEnv) {
       // NOTE: iModel.js specific plugin to copy a set of static resources from the node_modules
       // directory of each dependent package into the 'build/public' directory.
       // Used for resources such as locales, which are defined by each consuming package.
-      new CopyPlugin({
-        patterns: [
-          {
-            from: '**/public/**/*',
-            context: 'node_modules/@bentley',
-            noErrorOnMissing: true,
-            to({ absoluteFilename }) {
-              return Promise.resolve(
-                /(public\\)(.*)/.exec(absoluteFilename)[2]
-              );
-            },
-          },
-          {
-            from: '**/public/**/*',
-            context: 'node_modules/@itwin',
-            noErrorOnMissing: true,
-            to({ absoluteFilename }) {
-              return Promise.resolve(
-                /(public\\)(.*)/.exec(absoluteFilename)[2]
-              );
-            },
-          },
-        ],
-      }),
+      new CopyStaticAssetsPlugin({}),
 
       // NOTE: FilterWarningsPlugin is used to ignore warning coming from sourcemaps
       new FilterWarningsPlugin({ exclude: /Failed to parse source map/ }),
