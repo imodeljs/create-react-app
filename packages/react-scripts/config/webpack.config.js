@@ -50,8 +50,6 @@ const {
   IModeljsLibraryExportsPlugin,
 } = require('@bentley/webpack-tools-core');
 
-const CopyPlugin = require('copy-webpack-plugin');
-
 // iModel.js change to support using the fast-sass-loader instead of sass-loader.
 // This solves long build times on smaller machines attempting to build an app with
 // a large amount of sccs/sass files.
