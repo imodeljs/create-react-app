@@ -46,6 +46,7 @@ const FilterWarningsPlugin = require('webpack-filter-warnings-plugin');
 
 const {
   BanBackendImportsPlugin,
+  CopyBentleyStaticResourcesPlugin,
   CopyStaticAssetsPlugin,
   IModeljsLibraryExportsPlugin,
 } = require('@bentley/webpack-tools-core');
