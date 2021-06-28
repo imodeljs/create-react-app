@@ -67,7 +67,7 @@ const shouldTranspileDeps = process.env.TRANSPILE_DEPS !== 'false';
 
 const shouldMinify = process.env.DISABLE_TERSER !== 'true';
 
-const useNewAssetCopy = process.env.USE_NEW_ASSET_COPY === 'true';
+const disableNewAssetCopy = process.env.DISABLE_NEW_ASSET_COPY === 'true';
 
 // End iModel.js Changes block
 
@@ -701,7 +701,7 @@ module.exports = function(webpackEnv) {
       // NOTE: iModel.js specific plugin to copy a set of static resources from the node_modules
       // directory of each dependent package into the 'build/public' directory.
       // Used for resources such as locales, which are defined by each consuming package.
-      useNewAssetCopy
+      disableNewAssetCopy
         ? new CopyStaticAssetsPlugin({})
         : new CopyBentleyStaticResourcesPlugin(['public'], true),
 
