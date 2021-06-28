@@ -702,8 +702,8 @@ module.exports = function(webpackEnv) {
       // directory of each dependent package into the 'build/public' directory.
       // Used for resources such as locales, which are defined by each consuming package.
       disableNewAssetCopy
-        ? new CopyStaticAssetsPlugin({})
-        : new CopyBentleyStaticResourcesPlugin(['public'], true),
+        ? new CopyBentleyStaticResourcesPlugin(['public'], true)
+        : new CopyStaticAssetsPlugin({}),
 
       // NOTE: FilterWarningsPlugin is used to ignore warning coming from sourcemaps
       new FilterWarningsPlugin({ exclude: /Failed to parse source map/ }),
