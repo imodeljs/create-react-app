@@ -66,6 +66,8 @@ const shouldTranspileDeps = process.env.TRANSPILE_DEPS !== 'false';
 
 const shouldMinify = process.env.DISABLE_TERSER !== 'true';
 
+const useNewAssetCopy = process.env.USE_NEW_ASSET_COPY === 'true';
+
 // End iModel.js Changes block
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
@@ -698,7 +700,9 @@ module.exports = function(webpackEnv) {
       // NOTE: iModel.js specific plugin to copy a set of static resources from the node_modules
       // directory of each dependent package into the 'build/public' directory.
       // Used for resources such as locales, which are defined by each consuming package.
-      new CopyStaticAssetsPlugin({}),
+      useNewAssetCopy
+        ? new CopyStaticAssetsPlugin({})
+        : new CopyBentleyStaticResourcesPlugin(['public'], true),
 
       // NOTE: FilterWarningsPlugin is used to ignore warning coming from sourcemaps
       new FilterWarningsPlugin({ exclude: /Failed to parse source map/ }),
