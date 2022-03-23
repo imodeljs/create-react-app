@@ -144,6 +144,12 @@ module.exports = function (webpackEnv) {
 
   const shouldUseReactRefresh = env.raw.FAST_REFRESH;
 
+  if (env.raw.IMJS_URL_PREFIX === undefined) {
+    env.stringified[
+      'process.env'
+    ].IMJS_URL_PREFIX = `(globalThis.IMJS_URL_PREFIX ? globalThis.IMJS_URL_PREFIX : "")`;
+  }
+
   // common function to get style loaders
   const getStyleLoaders = (cssOptions, preProcessor) => {
     const loaders = [
@@ -450,6 +456,9 @@ module.exports = function (webpackEnv) {
     module: {
       strictExportPresence: true,
       rules: [
+        // Disable require.ensure as it's not a standard language feature.
+        // Add support for magic comments in commonjs modules (i.e. webpackIgnore for dynamic imports)
+        { parser: { requireEnsure: false, commonjsMagicComments: true } },
         // Handle node_modules packages that contain sourcemaps
         shouldUseSourceMap && {
           enforce: 'pre',
