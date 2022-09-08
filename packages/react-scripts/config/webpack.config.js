@@ -40,31 +40,18 @@ const createEnvironmentHash = require('./webpack/persistentCache/createEnvironme
 
 // iModel.js Changes block
 
-const SpeedMeasureWebpackPlugin = require('speed-measure-webpack-plugin');
-const FilterWarningsPlugin = require('webpack-filter-warnings-plugin');
-
-const {
-  BanBackendImportsPlugin,
-  CopyBentleyStaticResourcesPlugin,
-  CopyStaticAssetsPlugin,
-  IModeljsLibraryExportsPlugin
-} = require('@itwin/core-webpack-tools');
+const CopyPlugin = require("copy-webpack-plugin");
 
 // iModel.js change to support using the fast-sass-loader instead of sass-loader.
 // This solves long build times on smaller machines attempting to build an app with
 // a large amount of sccs/sass files.
 const shouldUseFastSass = process.env.USE_FAST_SASS === 'true';
 
-const shouldDebugBuildPerformance =
-  process.env.DEBUG_BUILD_PERFORMANCE === 'true';
-
 const shouldUseProdSourceMap = process.env.USE_FULL_SOURCEMAP === 'true';
 
 const shouldTranspileDeps = process.env.TRANSPILE_DEPS !== 'false';
 
 const shouldMinify = process.env.DISABLE_TERSER !== 'true';
-
-const disableNewAssetCopy = process.env.DISABLE_NEW_ASSET_COPY === 'true';
 
 // End iModel.js Changes block
 
@@ -144,11 +131,41 @@ module.exports = function (webpackEnv) {
 
   const shouldUseReactRefresh = env.raw.FAST_REFRESH;
 
+  // Begin iModel.js Changes block
+
   if (env.raw.IMJS_URL_PREFIX === undefined) {
     env.stringified[
       'process.env'
-    ].IMJS_URL_PREFIX = `(globalThis.IMJS_URL_PREFIX ? globalThis.IMJS_URL_PREFIX : "")`;
+    ].IMJS_URL_PREFIX = `(globalThis.IMJS_URL_PREFIX ? globalThis.IMJS_URL_PREFIX : undefined)`;
   }
+
+  const sassLoaderConfig = shouldUseFastSass
+    ? {
+      loader: require.resolve('fast-sass-loader'),
+      options: {
+        includePaths: [path.resolve('node_modules')],
+        outputStyle: isEnvProduction && 'compressed',
+      },
+    } : 'sass-loader';
+
+  const copyPluginPatterns = Object.keys(require(paths.appPackageJson).dependencies)
+    .filter(dependency => dependency.startsWith('@bentley') || dependency.startsWith('@itwin'))
+    .map(dependency => {
+      return {
+        from: "**/public/**",
+        noErrorOnMissing: true,
+        context: path.dirname(require.resolve(`${paths.appNodeModules}/${dependency}/package.json`)),
+        globOptions: {
+          ignore: ["**/node_modules/**"],
+        },
+        to({ absoluteFilename }) {
+          const regex = new RegExp("(public(?:\\\\|\/))(.*)");
+          return regex.exec(absoluteFilename)[2];
+        },
+      };
+    });
+
+  // End iModel.js Changes block
 
   // common function to get style loaders
   const getStyleLoaders = (cssOptions, preProcessor) => {
@@ -236,62 +253,11 @@ module.exports = function (webpackEnv) {
     return loaders;
   };
 
-  // iModel.js Changes to include a plugin to measure performance of a build.
-  const speedMeasurePluginIncompatiblePlugins = [
-    // Generates an `index.html` file with the <script> injected.
-    new HtmlWebpackPlugin(
-      Object.assign(
-        {},
-        {
-          inject: true,
-          template: paths.appHtml,
-        },
-        isEnvProduction
-          ? {
-              minify: {
-                removeComments: true,
-                collapseWhitespace: true,
-                removeRedundantAttributes: true,
-                useShortDoctype: true,
-                removeEmptyAttributes: true,
-                removeStyleLinkTypeAttributes: true,
-                keepClosingSlash: true,
-                minifyJS: true,
-                minifyCSS: true,
-                minifyURLs: true,
-              },
-            }
-          : undefined
-      )
-    ),
-    // Makes some environment variables available in index.html.
-    // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
-    // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
-    // In production, it will be an empty string unless you specify "homepage"
-    // in `package.json`, in which case it will be the pathname of that URL.
-    // In development, this will be an empty string.
-    new InterpolateHtmlPlugin(HtmlWebpackPlugin, env.raw),
-  ];
-  const injectSpeedMeasurePluginIncompatiblePlugins = webpackConfig => {
-    const plugins = webpackConfig.plugins;
-    plugins.unshift.apply(plugins, speedMeasurePluginIncompatiblePlugins);
-  };
-  const fastSassLoaderConfig = {
-    loader: require.resolve('fast-sass-loader'),
-    options: {
-      includePaths: [path.resolve('node_modules')],
-      outputStyle: isEnvProduction && 'compressed',
-    },
-  };
-
-  const sassLoaderConfig = shouldUseFastSass
-    ? fastSassLoaderConfig
-    : 'sass-loader';
-
-  const rawConfig = {
+  /** @type {import("webpack").Configuration } */
+  const webpackConfig = {
     target: ['browserslist'],
     // Webpack noise constrained to errors and warnings
-    stats: 'errors-warnings',
+    stats: isEnvProduction ? 'errors-warnings' : undefined,
     mode: isEnvProduction ? 'production' : isEnvDevelopment && 'development',
     // Stop compilation early in production
     bail: isEnvProduction,
@@ -438,8 +404,6 @@ module.exports = function (webpackEnv) {
         ...(modules.webpackAliases || {}),
       },
       plugins: [
-        // Throw an error if @bentley/imodeljs-backend or src/backend/... files are imported.
-        new BanBackendImportsPlugin(path.join(paths.appSrc, 'backend')),
         // Prevents users from importing files from outside of src/ (or node_modules/).
         // This often causes confusion because we only process files within src/ with babel.
         // To fix this, we prevent you from importing files out of src/ -- if you'd like to,
@@ -460,7 +424,10 @@ module.exports = function (webpackEnv) {
       rules: [
         // Disable require.ensure as it's not a standard language feature.
         // Add support for magic comments in commonjs modules (i.e. webpackIgnore for dynamic imports)
-        { parser: { requireEnsure: false, commonjsMagicComments: true } },
+        {
+          test: /\.[cm]?(ts|tsx|js|jsx)$/,
+          parser: { javascript: { requireEnsure: false, commonjsMagicComments: true }, }, 
+        },
         // Handle node_modules packages that contain sourcemaps
         shouldUseSourceMap && {
           enforce: 'pre',
@@ -746,25 +713,37 @@ module.exports = function (webpackEnv) {
       ].filter(Boolean),
     },
     plugins: [
-      // NOTE: iModel.js specific plugin to allow exposing iModel.js shared libraries
-      // into the global scope for use within iModel.js Extensions.
-      new IModeljsLibraryExportsPlugin(),
+      // Generates an `index.html` file with the <script> injected.
+      new HtmlWebpackPlugin(
+        Object.assign(
+          {},
+          {
+            inject: true,
+            template: paths.appHtml,
+          },
+          isEnvProduction
+            ? {
+                minify: {
+                  removeComments: true,
+                  collapseWhitespace: true,
+                  removeRedundantAttributes: true,
+                  useShortDoctype: true,
+                  removeEmptyAttributes: true,
+                  removeStyleLinkTypeAttributes: true,
+                  keepClosingSlash: true,
+                  minifyJS: true,
+                  minifyCSS: true,
+                  minifyURLs: true,
+                },
+              }
+            : undefined
+        )
+      ),
 
       // NOTE: iModel.js specific plugin to copy a set of static resources from the node_modules
       // directory of each dependent package into the 'build/public' directory.
       // Used for resources such as locales, which are defined by each consuming package.
-      disableNewAssetCopy
-        ? new CopyBentleyStaticResourcesPlugin(['public'], true)
-        : new CopyStaticAssetsPlugin({}),
-
-      // NOTE: FilterWarningsPlugin is used to ignore warning coming from sourcemaps
-      new FilterWarningsPlugin({ exclude: /Failed to parse source map/ }),
-
-      // NOTE: HtmlWebpackPlugin, and InterpolateHtmlPlugin are injected here
-      // after SpeedMeasureWebpackPlugin makes a wrapper, so SMWP won't track them
-      // they cause issues when tracked by SMWP
-      // SEE: https://github.com/jantimon/html-webpack-plugin/issues/1090
-      // SEE: injectSpeedMeasurePluginIncompatiblePlugins
+      new CopyPlugin({ patterns: copyPluginPatterns }),
 
       // Inlines the webpack runtime script. This script is too small to warrant
       // a network request.
@@ -928,13 +907,9 @@ module.exports = function (webpackEnv) {
     // Turn off performance processing because we utilize
     // our own hints via the FileSizeReporter
     performance: false,
+    ignoreWarnings: [
+      (warn) => /Failed to parse source map/.test(warn.message)
+    ],
   };
-
-  const config = shouldDebugBuildPerformance
-    ? new SpeedMeasureWebpackPlugin().wrap(rawConfig)
-    : rawConfig;
-
-  injectSpeedMeasurePluginIncompatiblePlugins(config);
-
-  return config;
+  return webpackConfig;
 };
