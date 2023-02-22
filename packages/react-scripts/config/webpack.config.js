@@ -55,7 +55,7 @@ const shouldMinify = process.env.DISABLE_TERSER !== 'true';
 
 const shouldCopyAssets = process.env.DISABLE_COPY_ASSETS !== 'true';
 
-const isUsingNpm = process.env.IS_USING_NPM === 'true';
+const isUsingNpm = process.env.USING_NPM === 'true';
 
 // End iModel.js Changes block
 
