@@ -161,7 +161,7 @@ module.exports = function (webpackEnv) {
           ignore: ["/node_modules/**", "**/index.html"],
         },
         to({ absoluteFilename }) {
-          const regex = new RegExp("(public(?:\\\\|\/))(.*)");
+          const regex = new RegExp("(public(?:\\\\|/))(.*)");
           return regex.exec(absoluteFilename)[2];
         },
       };
